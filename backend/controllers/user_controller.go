@@ -26,8 +26,8 @@ func Register(ctx *gin.Context) {
 
 	// 验证邮箱是否存在
 	var existingUser models.User
-	if err := global.DB.Where("email = ?", user.Email).First(&existingUser).Error; err == nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"Error": "Email already registered"})
+	if err := global.DB.Where("email = ?", user.Email).First(&existingUser).Error; err == nil || existingUser.Name == user.Name {
+		ctx.JSON(http.StatusBadRequest, gin.H{"Error": "Email or Name already registered"})
 		return
 	}
 
@@ -46,12 +46,28 @@ func Register(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"Message": "Insert user successfully"})
+	var input models.Account
+
+	input.UserID = user.ID
+	input.Balance = 0
+	input.AccountNumber, err = utils.GenerateBankAccountNumber(16)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"Error": "Can't generate card number"})
+		return
+	}
+
+	if err := global.DB.Create(&input).Error; err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"Error": "Can't insert data in Account"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"Message": "Add user successfully"})
 }
 
 func Login(ctx *gin.Context) {
 	var input struct {
-		Name string `json:"name"`
+		Name     string `json:"name"`
 		Password string `json:"password"`
 	}
 
