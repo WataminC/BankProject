@@ -27,6 +27,7 @@ func SetRouter() *gin.Engine {
 	api.Use(middlewares.AuthMiddleWare())
 	{
 		api.GET("/account", controllers.GetBalance)
+		api.POST("/transaction/deposit", controllers.Deposit)
 	}
 
 	return r
