@@ -1,0 +1,8 @@
+app:
+  name: bank-app
+  port: 8080
+
+database:
+  dsn: "host=localhost user=watamin password=c dbname=bank port=5432 sslmode=disable"
+  MaxIdleConns: 10
+  MaxOpenConns: 20
