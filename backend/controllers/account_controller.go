@@ -47,21 +47,67 @@ func Deposit(ctx *gin.Context) {
 	`, username).Scan(&account)
 
 	var input struct {
-		Money string `json:"money"`
+		Amount string `json:"amount"`
 	}
 
 	if err := ctx.ShouldBindBodyWithJSON(&input); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"Error": "Can't read input"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"Error": "Invalid input"})
 		return
 	}
 
-	money, err := strconv.ParseFloat(input.Money, 64)
+	money, err := strconv.ParseFloat(input.Amount, 64)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"Error": "Can't read input"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"Error": "Invalid input"})
 		return
 	}
 
 	global.DB.Model(&account).Update("balance", account.Balance+money)
 
-	ctx.JSON(http.StatusOK, gin.H{"New Balance": account.Balance + money})
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "Deposit successfully",	
+		"new_balance": account.Balance})
+}
+
+func Withdraw(ctx *gin.Context) {
+	// 从上下文中获取用户名
+	username, exists := ctx.Get("username")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized access"})
+		return
+	}
+
+	var account models.Account
+
+	global.DB.Raw(`
+		SELECT accounts.*
+		FROM accounts JOIN users ON accounts.user_id = users.id
+		WHERE users.name = ?
+	`, username).Scan(&account)
+
+	var input struct {
+		Amount string `json:"amount"`
+	}
+
+	if err := ctx.ShouldBindBodyWithJSON(&input); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"Error": "Invalid input"})
+		return
+	}
+
+	money, err := strconv.ParseFloat(input.Amount, 64)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"Error": "Invalid input"})
+		return
+	}
+
+	// 检查账户余额是否足够
+	if account.Balance < money {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Insufficient balance"})
+		return
+	}
+
+	global.DB.Model(&account).Update("balance", account.Balance-money)
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "Withdraw successfully",		
+		"new_balance": account.Balance})
 }
