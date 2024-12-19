@@ -20,18 +20,21 @@
         <button @click="withdraw" class="action-button">Withdraw</button>
       </div>
     </div>
+    <button @click="goBack" class="back-button">Back to Dashboard</button>
   </div>
 </template>
 
 <script>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import { useRouter } from 'vue-router';
 
 export default {
   name: 'TransactionView',
   setup() {
     const userInfo = ref({});
     const amount = ref(0);
+    const router = useRouter();
 
     const fetchUserInfo = async () => {
       try {
@@ -46,32 +49,38 @@ export default {
     const deposit = async () => {
       try {
         const response = await axios.post('http://localhost:8080/api/transaction/deposit', {
-          amount: amount.value.toString(),
+          amount: `${amount.value}`,
         });
-        userInfo.value.balance += amount.value;
+        userInfo.value.balance += parseFloat(amount.value);
         alert('Deposit successful');
       } catch (error) {
-        alert('Deposit failed');
+        console.error('Failed to deposit:', error.response.data.Error);
+        alert('Deposit failed: ' + error.response.data.Error);
       }
     };
 
     const withdraw = async () => {
       try {
         const response = await axios.post('http://localhost:8080/api/transaction/withdraw', {
-          amount: amount.value.toString(),
+          amount: `${amount.value}`,
         });
-        userInfo.value.balance -= amount.value;
+        userInfo.value.balance -= parseFloat(amount.value);
         alert('Withdraw successful');
       } catch (error) {
-        alert('Withdraw failed');
+        console.error('Failed to withdraw:', error.response.data.Error);
+        alert('Withdraw failed: ' + error.response.data.Error);
       }
+    };
+
+    const goBack = () => {
+      router.push('/dashboard');
     };
 
     onMounted(() => {
       fetchUserInfo();
     });
 
-    return { userInfo, amount, deposit, withdraw };
+    return { userInfo, amount, deposit, withdraw, goBack };
   }
 };
 </script>
@@ -79,6 +88,7 @@ export default {
 <style scoped>
 .transaction-container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100vh;
@@ -156,6 +166,23 @@ input:focus {
 
 .action-button:hover {
   background-color: #4db6ac;
+  transform: scale(1.05);
+}
+
+.back-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #ff7043;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.back-button:hover {
+  background-color: #ff5722;
   transform: scale(1.05);
 }
 

@@ -14,6 +14,7 @@
         <button @click="viewFriends" class="action-button">Friends List</button>
       </div>
     </div>
+    <button @click="logout" class="logout-button">Logout</button>
   </div>
 </template>
 
@@ -52,11 +53,16 @@ export default {
       console.log('Friends List clicked');
     };
 
+    const logout = () => {
+      localStorage.removeItem('token');
+      router.push('/login');
+    };
+
     onMounted(() => {
       fetchUserInfo();
     });
 
-    return { userInfo, handleTransaction, transfer, viewFriends };
+    return { userInfo, handleTransaction, transfer, viewFriends, logout };
   }
 };
 </script>
@@ -64,6 +70,7 @@ export default {
 <style scoped>
 .dashboard-container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100vh;
@@ -115,6 +122,23 @@ export default {
 
 .action-button:hover {
   background-color: #4db6ac;
+  transform: scale(1.05);
+}
+
+.logout-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #ff7043;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.logout-button:hover {
+  background-color: #ff5722;
   transform: scale(1.05);
 }
 
