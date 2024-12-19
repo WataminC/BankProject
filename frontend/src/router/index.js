@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import LoginView from '@/views/LoginView.vue';
 import RegisterView from '@/views/RegisterView.vue';
 import UserDashboard from '@/views/DashboardView.vue';
+import TransactionView from '@/views/TransactionView.vue';
 
 const routes = [
   // redirect to login view
@@ -21,6 +22,12 @@ const routes = [
     path: '/dashboard',
     name: 'Dashboard',
     component: UserDashboard,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/transaction',
+    name: 'Transaction',
+    component: TransactionView,
     meta: { requiresAuth: true },
   },
   // 其他路由配置

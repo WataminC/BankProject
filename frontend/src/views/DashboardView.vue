@@ -20,15 +20,17 @@
 <script>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import { useRouter } from 'vue-router';
 
 export default {
   name: 'UserDashboard',
   setup() {
     const userInfo = ref({});
+    const router = useRouter();
 
     const fetchUserInfo = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/account', {});
+        const response = await axios.get('http://localhost:8080/api/account');
         userInfo.value = response.data;
       } catch (error) {
         console.error('Failed to fetch user info:', error.response.data.Error);
@@ -37,8 +39,7 @@ export default {
     };
 
     const handleTransaction = () => {
-      // Handle deposit/withdraw logic
-      console.log('Deposit/Withdraw clicked');
+      router.push('/transaction');
     };
 
     const transfer = () => {
