@@ -34,6 +34,8 @@
 
 <script>
 import { ref, onMounted } from 'vue';
+import axios from 'axios';
+import { useRouter } from 'vue-router';
 
 export default {
   name: 'Login',
@@ -41,23 +43,31 @@ export default {
     const username = ref('');
     const password = ref('');
     const showForm = ref(false);
+    const router = useRouter();
 
-    const handleLogin = () => {
-      console.log('Logging in with:', username.value, password.value);
-      // Add logic to handle login
+    const handleLogin = async () => {
+      try {
+        const response = await axios.post('http://localhost:8080/api/auth/login', {
+          name: username.value,
+          password: password.value,
+        });
+        console.log('Token:', response.data.token);
+        // Handle successful login (e.g., store token, navigate to user dashboard)
+        localStorage.setItem('token', response.data.token);
+        router.push('/dashboard');
+      } catch (error) {
+        console.error(error.response.data.Error);
+        // Handle login error (e.g., show error message)
+        alert('Login failed: ' + error.response.data.Error);
+      }
     };
 
-    const navigateToRegister = () => {
-      console.log('Navigating to register page');
-      // Add navigation logic here
+    const goToRegister = () => {
+      router.push('/register');
     };
 
     const animationEnded = () => {
       console.log('Animation ended');
-    };
-
-    const goToRegister = () => {
-      this.$router.push('/register');
     };
 
     onMounted(() => {
@@ -66,12 +76,7 @@ export default {
       }, 100);
     });
 
-    return { username, password, handleLogin, navigateToRegister, showForm, animationEnded, goToRegister };
-  },
-  methods: {
-    goToRegister() {
-      this.$router.push('/register');
-    }
+    return { username, password, handleLogin, showForm, animationEnded, goToRegister };
   }
 };
 </script>
