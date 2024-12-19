@@ -10,6 +10,14 @@ import (
 )
 
 func GetInfo(ctx *gin.Context) {
+	var userAccountInfo struct {
+		UserID        uint    `gorm:"column:user_id"`
+		AccountNumber string  `gorm:"column:account_number"`
+		Balance       float64 `gorm:"column:balance"`
+		Name          string  `gorm:"column:name"`
+		Email         string  `gorm:"column:email"`
+	}
+
 	username, exists := ctx.Get("username")
 
 	if !exists {
@@ -18,19 +26,18 @@ func GetInfo(ctx *gin.Context) {
 		return
 	}
 
-	var account models.Account
-
 	global.DB.Raw(`
-		SELECT accounts.*
+		SELECT *
 		FROM accounts JOIN users ON accounts.user_id = users.id
 		WHERE users.name = ?
-	`, username).Scan(&account)
+	`, username).Scan(&userAccountInfo)
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"username":       username,
-		"account_number": account.AccountNumber,
-		"balance":        account.Balance,
-	})
+		"userID":         userAccountInfo.UserID,
+		"username":       userAccountInfo.Name,
+		"email":          userAccountInfo.Email,
+		"account_number": userAccountInfo.AccountNumber,
+		"balance":        userAccountInfo.Balance})
 }
 
 func Deposit(ctx *gin.Context) {
