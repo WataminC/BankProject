@@ -11,6 +11,74 @@ import (
 )
 
 /*
+ * Get Transaction API
+ *
+ * Output:
+ * when no transactions found:
+ * {
+ *   "message": "No transactions found"
+ * }
+ *
+ * when transactions found:
+ * [
+ *    {
+ *        "ID": 23,
+ *        "AccountID": 2,
+ *        "Type": "Transfer",
+ *        "Amount": 1,
+ *        "TargetAccountNumber": "3281543062464578",
+ *        "CreatedAt": "2024-12-19T22:17:15.906692+08:00",
+ *        "UpdatedAt": "2024-12-19T22:17:15.906692+08:00"
+ *    },
+ *    {
+ *        "ID": 24,
+ *        "AccountID": 2,
+ *        "Type": "Transfer",
+ *        "Amount": 1,
+ *        "TargetAccountNumber": "3281543062464578",
+ *        "CreatedAt": "2024-12-19T22:18:19.905653+08:00",
+ *        "UpdatedAt": "2024-12-19T22:18:19.905653+08:00"
+ *    },
+ *    {
+ *        "ID": 25,
+ *        "AccountID": 2,
+ *        "Type": "Transfer",
+ *        "Amount": 1,
+ *        "TargetAccountNumber": "3281543062464578",
+ *        "CreatedAt": "2024-12-19T22:18:33.361518+08:00",
+ *        "UpdatedAt": "2024-12-19T22:18:33.361518+08:00"
+ *    }
+ * ]
+ *
+ */
+
+func GetTransaction(ctx *gin.Context) {
+	username, exists := ctx.Get("username")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"Error": "Unauthorized access"})
+		return
+	}
+
+	var transactions []models.Transaction
+
+	if err := global.DB.Raw(`
+		SELECT transactions.*
+		FROM transactions JOIN accounts ON transactions.account_id = accounts.id 
+		JOIN users ON accounts.user_id = users.id
+		WHERE users.name = ?	
+	`, username).Scan(&transactions).Error; err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		return
+	}
+
+	if transactions == nil {
+		ctx.JSON(http.StatusOK, gin.H{"message": "No transactions found"})
+		return
+	}
+	ctx.JSON(http.StatusOK, transactions)
+}
+
+/*
  * Add Transaction API
  *
  * Input:
@@ -92,7 +160,7 @@ func AddTransaction(ctx *gin.Context) {
 	// Update source account balance
 	var sourceAccount models.Account
 	if err := tx.Where("id = ?", input.AccountID).First(&sourceAccount).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"Error": err})
+		ctx.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
 		tx.Rollback()
 		return
 	}
@@ -107,14 +175,14 @@ func AddTransaction(ctx *gin.Context) {
 	// Update target account balance
 	var targetAccount models.Account
 	if err := tx.Where("account_number = ?", input.TargetAccountNumber).First(&targetAccount).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"Error": err})
+		ctx.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
 		tx.Rollback()
 		return
 	}
 	targetAccount.Balance += input.Amount
 
 	if err := tx.Save(&targetAccount).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"Error": err.Error})
+		ctx.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
 		tx.Rollback()
 		return
 	}

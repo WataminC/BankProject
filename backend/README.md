@@ -135,3 +135,70 @@ Development:
 }
 ```
 - 功能描述: 用户从指定的账户中取款。
+
+6. 获得交易记录接口
+- 路径: /api/transaction
+- 方法: GET
+
+请求头:
+```json
+{
+  "Authorization": "Bearer generated-jwt-token"
+}
+```
+
+响应体:
+- 有交易记录时
+```json
+[
+  {
+    "ID": 23,
+    "AccountID": 2,
+    "Type": "Transfer",
+    "Amount": 1,
+    "TargetAccountNumber": "3281543062464578",
+    "CreatedAt": "2024-12-19T22:17:15.906692+08:00",
+    "UpdatedAt": "2024-12-19T22:17:15.906692+08:00"
+  },
+  {
+    "ID": 24,
+    "AccountID": 2,
+    "Type": "Transfer",
+    "Amount": 1,
+    "TargetAccountNumber": "3281543062464578",
+    "CreatedAt": "2024-12-19T22:18:19.905653+08:00",
+    "UpdatedAt": "2024-12-19T22:18:19.905653+08:00"
+  }
+]
+```
+- 无交易记录时
+```json
+"message": "No transactions found"
+```
+
+功能描述:
+- 根据用户的 JWT token 返回用户的交易记录。
+
+7. 转账接口
+
+- 路径: /api/transaction/transfer
+- 方法: POST
+
+请求体:
+```json
+{
+  "account_id": 1,
+  "target_account_number": "3281543062464578",
+  "amount": 100.0
+}
+```
+
+响应体:
+```json
+{
+  "message": "Transaction successful"
+}
+```
+
+功能描述:
+- 用户从一个账户向另一个账户转账。
