@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetBalance(ctx *gin.Context) {
+func GetInfo(ctx *gin.Context) {
 	username, exists := ctx.Get("username")
 
 	if !exists {
@@ -26,7 +26,11 @@ func GetBalance(ctx *gin.Context) {
 		WHERE users.name = ?
 	`, username).Scan(&account)
 
-	ctx.JSON(http.StatusOK, gin.H{"balance": account.Balance})
+	ctx.JSON(http.StatusOK, gin.H{
+		"username":       username,
+		"account_number": account.AccountNumber,
+		"balance":        account.Balance,
+	})
 }
 
 func Deposit(ctx *gin.Context) {
@@ -64,7 +68,7 @@ func Deposit(ctx *gin.Context) {
 	global.DB.Model(&account).Update("balance", account.Balance+money)
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"message": "Deposit successfully",	
+		"message":     "Deposit successfully",
 		"new_balance": account.Balance})
 }
 
@@ -108,6 +112,6 @@ func Withdraw(ctx *gin.Context) {
 	global.DB.Model(&account).Update("balance", account.Balance-money)
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"message": "Withdraw successfully",		
+		"message":     "Withdraw successfully",
 		"new_balance": account.Balance})
 }

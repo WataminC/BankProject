@@ -29,7 +29,7 @@ func SetRouter() *gin.Engine {
 	api := r.Group("/api")
 	api.Use(middlewares.AuthMiddleWare())
 	{
-		api.GET("/account", controllers.GetBalance)
+		api.GET("/account", controllers.GetInfo)
 		api.POST("/transaction/deposit", controllers.Deposit)
 		api.POST("/transaction/withdraw", controllers.Withdraw)
 	}
