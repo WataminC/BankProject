@@ -3,6 +3,7 @@ import LoginView from '@/views/LoginView.vue';
 import RegisterView from '@/views/RegisterView.vue';
 import UserDashboard from '@/views/DashboardView.vue';
 import TransactionView from '@/views/TransactionView.vue';
+import TransferView from '@/views/TransferView.vue';
 
 const routes = [
   // redirect to login view
@@ -28,6 +29,12 @@ const routes = [
     path: '/transaction',
     name: 'Transaction',
     component: TransactionView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/transfer',
+    name: 'Transfer',
+    component: TransferView,
     meta: { requiresAuth: true },
   },
   // 其他路由配置

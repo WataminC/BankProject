@@ -33,6 +33,7 @@ export default {
       try {
         const response = await axios.get('http://localhost:8080/api/account');
         userInfo.value = response.data;
+        localStorage.setItem('userID', userInfo.value.userID);
       } catch (error) {
         console.error('Failed to fetch user info:', error.response.data.Error);
         // Handle error (e.g., redirect to login page)
@@ -45,7 +46,7 @@ export default {
 
     const transfer = () => {
       // Handle transfer logic
-      console.log('Transfer clicked');
+      router.push('/transfer');
     };
 
     const viewFriends = () => {
