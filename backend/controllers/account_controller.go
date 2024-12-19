@@ -62,7 +62,7 @@ func Deposit(ctx *gin.Context) {
 	}
 
 	if err := ctx.ShouldBindBodyWithJSON(&input); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"Error": "Invalid input"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"Error": "Cannot bind input"})
 		return
 	}
 

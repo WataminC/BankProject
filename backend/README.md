@@ -4,10 +4,12 @@ Development:
 2. Define models
 3. Connect database and auto migrate
 
-4. Back end API
+4. Back End API
    1. Register and Login
    2. Login middleware
    3. Get Balance 
+   4. Deposit and Withdraw
+   5. Get and Add Transaction
 
 # API 
 
@@ -73,3 +75,63 @@ Development:
 功能：
 - 验证用户名和密码。
 - 返回用户的JWT令牌，用于后续验证。
+
+3. 查看用户信息接口
+- 路径: /api/user
+- 方法: GET
+
+- 请求头:
+```json
+{
+  "Authorization": "Bearer generated-jwt-token"
+}
+```
+```json
+{
+    "account_number": "3281543062464578",
+    "balance": 15.4,
+    "email": "admin@example.com",
+    "userID": 1,
+    "username": "admin"
+}
+```
+- 功能描述: 根据用户的 JWT token 返回用户的基本信息。
+
+4. 存款接口
+- 路径: /api/deposit
+- 方法: POST
+
+请求体:
+```json
+{
+  "amount": 100.0
+}
+```
+
+响应体:
+```json
+{
+  "message": "Deposit successful"
+}
+```
+- 功能描述: 用户向指定的账户存款。
+
+5. 取款接口
+- 路径: /api/withdraw
+- 方法: POST
+
+请求体:
+```json
+{
+    "amount" : "0.01"
+}
+
+```
+响应体:
+```json
+{
+    "message": "Withdraw successfully",
+    "new_balance": 3.39
+}
+```
+- 功能描述: 用户从指定的账户中取款。

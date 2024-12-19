@@ -32,6 +32,7 @@ func SetRouter() *gin.Engine {
 		api.GET("/account", controllers.GetInfo)
 		api.POST("/transaction/deposit", controllers.Deposit)
 		api.POST("/transaction/withdraw", controllers.Withdraw)
+		api.POST("/transaction/transfer", controllers.AddTransaction)
 	}
 
 	return r
