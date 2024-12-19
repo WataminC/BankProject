@@ -53,6 +53,7 @@ export default {
         });
         console.log('Token:', response.data.token);
         // Handle successful login (e.g., store token, navigate to user dashboard)
+        console.log("Test", response.data.token);
         localStorage.setItem('token', response.data.token);
         router.push('/dashboard');
       } catch (error) {
