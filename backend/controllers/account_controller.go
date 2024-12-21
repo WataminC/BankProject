@@ -3,8 +3,11 @@ package controllers
 import (
 	"bank/global"
 	"bank/models"
+	"context"
+	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -26,11 +29,44 @@ func GetInfo(ctx *gin.Context) {
 		return
 	}
 
+	bg := context.Background()
+
+	// Check if the cache exists
+	if val, err := global.RDB.HGetAll(bg, fmt.Sprintf("user:%v:profile", username)).Result(); err == nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"userID":         val["userID"],
+			"username":       username,
+			"email":          val["email"],
+			"account_number": val["account_number"],
+			"balance":        val["balance"],
+		})
+		return
+	}
+
 	global.DB.Raw(`
 		SELECT *
 		FROM accounts JOIN users ON accounts.user_id = users.id
 		WHERE users.name = ?
 	`, username).Scan(&userAccountInfo)
+
+	// Set cache in redis
+	key := fmt.Sprintf("user:%v:profile", username)
+	if err := global.RDB.HSet(bg, key,
+		"userID", userAccountInfo.UserID,
+		"email", userAccountInfo.Email,
+		"account_number", userAccountInfo.AccountNumber,
+		"balance", userAccountInfo.Balance,
+	).Err(); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"Error": "Failed to cache user profile"})
+		return
+	}
+
+	// Set expiration time (e.g., 1 hour)
+	expiration := time.Hour
+	if err := global.RDB.Expire(bg, key, expiration).Err(); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"Error": "Failed to set cache expiration"})
+		return
+	}
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"userID":         userAccountInfo.UserID,
@@ -73,6 +109,14 @@ func Deposit(ctx *gin.Context) {
 	}
 
 	global.DB.Model(&account).Update("balance", account.Balance+money)
+
+	// Update cache in Redis
+	key := fmt.Sprintf("user:%v:profile", username)
+	bg := context.Background()
+	if err := global.RDB.HSet(bg, key, "balance", account.Balance).Err(); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"Error": "Failed to update cache"})
+		return
+	}
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"message":     "Deposit successfully",
@@ -117,6 +161,14 @@ func Withdraw(ctx *gin.Context) {
 	}
 
 	global.DB.Model(&account).Update("balance", account.Balance-money)
+
+	// Update cache in Redis
+	key := fmt.Sprintf("user:%v:profile", username)
+	bg := context.Background()
+	if err := global.RDB.HSet(bg, key, "balance", account.Balance).Err(); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"Error": "Failed to update cache"})
+		return
+	}
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"message":     "Withdraw successfully",
