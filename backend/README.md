@@ -202,3 +202,51 @@ Development:
 
 功能描述:
 - 用户从一个账户向另一个账户转账。
+
+贷款接口：
+1. 发生贷款请求 (创建贷款请求)
+2. 查询贷款请求
+3. 同意贷款 (同意贷款请求 -> 创建贷款)
+4. 还贷款 (修改/删除贷款)
+5. 查询贷款
+
+8. 贷款请求接口
+
+- 路径: /api/transaction/loan/request
+- 方法: POST
+
+请求体:
+```json
+{
+  "user_id": 1,
+  "amount": 200,
+  "interest": 2,
+}
+```
+
+响应体:
+```json
+{
+  "message": string
+}
+```
+
+9. 查询贷款请求
+
+- 路径：/api/admin/loan
+- 方法: GET
+
+响应体：
+```json
+{
+    "loan_request": [
+        {
+            "id": 1,
+            "user_id": 1,
+            "amount": 1,
+            "interest": 2,
+            "status": "pending"
+        }
+    ]
+}
+```

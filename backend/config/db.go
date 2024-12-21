@@ -11,7 +11,7 @@ import (
 )
 
 func MigrateDB() error {
-	err := global.DB.AutoMigrate(&models.User{}, &models.Account{}, &models.Transaction{})
+	err := global.DB.AutoMigrate(&models.User{}, &models.Account{}, &models.Transaction{}, &models.LoanRequest{}, &models.Loan{})
 	if err != nil {
 		return err
 	}
