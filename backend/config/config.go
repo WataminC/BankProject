@@ -2,6 +2,8 @@ package config
 
 import (
 	"log"
+	"os"
+	"bank/global"
 
 	"github.com/spf13/viper"
 )
@@ -16,15 +18,28 @@ type Config struct {
 		MaxIdleConns  int
 		MaxOpennConns int
 	}
+	Redis struct {
+		Addr     string
+		Port     string
+		PassWord string
+		DB       int
+	}
 }
 
 var AppConfig *Config
 
-func ReadYaml() {
+func ReadYaml(filePath string) {
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Println("Error:", err)
+		return
+	}
+	log.Println("Current Directory:", dir)
+
 	viper.SetConfigName("config")
 	viper.SetConfigType("yml")
 	// Should be changed to "./" when run test
-	viper.AddConfigPath("./config")
+	viper.AddConfigPath(filePath)
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("Error when reading config file: %v", err)
@@ -37,12 +52,19 @@ func ReadYaml() {
 	}
 }
 
-func InitConfig() error {
-	ReadYaml()
+func InitConfig(filePath string) error {
+	ReadYaml(filePath)
 
 	if err := InitDB(); err != nil {
 		log.Fatalf("Error when reading config file: %v", err)
 	}
+
+	rdb, err := InitRedis()
+	if err != nil {
+		log.Fatalf("Error when reading config file: %v", err)
+	}
+
+	global.RDB = rdb
 
 	return nil
 }

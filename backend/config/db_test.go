@@ -8,7 +8,7 @@ import (
 
 func TestInitDB(t *testing.T) {
 	// 调用 InitDB 并检查是否返回错误
-	config.ReadYaml()
+	config.ReadYaml("./")
 	err := config.InitDB()
 	if err != nil {
 		// 如果初始化失败，打印错误信息
