@@ -205,7 +205,7 @@ Development:
 
 8. 贷款请求接口
 
-- 路径: /api/transaction/loan/request
+- 路径: /api/loan/request
 - 方法: POST
 
 请求体:
@@ -213,20 +213,66 @@ Development:
 {
   "user_id": 1,
   "amount": 200,
-  "interest": 2,
+  "interest": 2
 }
 ```
 
 响应体:
 ```json
 {
-  "message": string
+  "message": "Loan request created successfully"
 }
 ```
 
 - 功能描述：请求贷款，由管理员审批后通过
 
 9. 查询贷款请求接口
+
+- 路径: /api/loan/request/query
+- 方法: POST
+
+请求体:
+```json
+{
+  "user_id": 1
+}
+```
+
+响应体:
+```json
+{
+  "is_succeed": true
+}
+```
+
+- 功能描述：查询贷款请求是否成功
+
+10. 查询贷款接口
+
+- 路径: /api/loan
+- 方法: POST
+
+请求体:
+```json
+{
+  "user_id": 1
+}
+```
+
+响应体:
+```json
+{
+  "id": 1,
+  "amount": 200,
+  "interest": 2,
+  "total_amount": 204,
+  "status": "approved"
+}
+```
+
+- 功能描述：查询当前用户的贷款信息
+
+11. 查询贷款请求接口
 
 - 路径：/api/admin/loan
 - 方法: GET
@@ -248,7 +294,7 @@ Development:
 
 - 功能描述：查询当前为pending的贷款请求
 
-10. 同意贷款接口
+12. 同意贷款接口
 
 - 路径: /api/admin/loan
 - 方法: GET
@@ -269,7 +315,7 @@ Development:
 
 - 功能描述：同意请求的id的贷款请求，将其状态更改为approved
 
-11. 查询贷款是否成功接口
+13. 查询贷款是否成功接口
 
 - 路径: /api/loan/request/query
 - 方法: POST
@@ -288,9 +334,9 @@ Development:
 }
 ```
 
-12. 还贷款接口
+14. 还贷款接口
 
-13. 查询贷款接口
+15. 查询贷款接口
 
 - 路径: /api/loan
 - 方法： POST
@@ -304,5 +350,11 @@ Development:
 
 响应体
 ```json
-
+{
+    "id": 1,
+    "amount": 1,
+    "interest": 2,
+    "total_amount": 1.02,
+    "status": "approved"
+}
 ```

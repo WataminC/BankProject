@@ -175,5 +175,19 @@ func QueryLoan(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"loan": loan})
+	var output struct {
+		ID          uint    `json:"id"`
+		Amount      float64 `json:"amount"`
+		Interest    float64 `json:"interest"`
+		TotalAmount float64 `json:"total_amount"`
+		Status      string  `json:"status"`
+	}
+
+	output.ID = loan.ID
+	output.Amount = loan.Amount
+	output.Interest = loan.Interest
+	output.TotalAmount = loan.TotalAmount
+	output.Status = loan.Status
+
+	ctx.JSON(http.StatusOK, output)
 }

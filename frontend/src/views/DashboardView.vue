@@ -11,7 +11,7 @@
       <div class="actions">
         <button @click="handleTransaction" class="action-button">Deposit/Withdraw</button>
         <button @click="transfer" class="action-button">Transfer</button>
-        <button @click="viewFriends" class="action-button">Friends List</button>
+        <button @click="goToLoan" class="action-button">Loan</button>
       </div>
     </div>
     <button @click="logout" class="logout-button">Logout</button>
@@ -49,9 +49,8 @@ export default {
       router.push('/transfer');
     };
 
-    const viewFriends = () => {
-      // Handle view friends list logic
-      console.log('Friends List clicked');
+    const goToLoan = () => {
+      router.push('/loan');
     };
 
     const logout = () => {
@@ -63,7 +62,7 @@ export default {
       fetchUserInfo();
     });
 
-    return { userInfo, handleTransaction, transfer, viewFriends, logout };
+    return { userInfo, handleTransaction, transfer, goToLoan, logout };
   }
 };
 </script>
