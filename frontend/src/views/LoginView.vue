@@ -55,7 +55,11 @@ export default {
         // Handle successful login (e.g., store token, navigate to user dashboard)
         console.log("Test", response.data.token);
         localStorage.setItem('token', response.data.token);
-        router.push('/dashboard');
+        if (username.value === 'admin') {
+          router.push('/admin');
+        } else {
+          router.push('/dashboard');
+        }
       } catch (error) {
         console.error(error.response.data.Error);
         // Handle login error (e.g., show error message)

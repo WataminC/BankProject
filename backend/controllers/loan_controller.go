@@ -66,7 +66,7 @@ func GetLoanRequest(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, gin.H{"loan_request": response})
+	c.JSON(http.StatusOK, response)
 }
 
 func ProcessLoanRequest(c *gin.Context) {
@@ -149,7 +149,7 @@ func QueryLoanRequest(ctx *gin.Context) {
 	}
 
 	var loanRequest models.LoanRequest
-	if err := global.DB.Where("user_id = ? AND status = ?", input.UserID, "approved").First(&loanRequest).Error; err != nil {
+	if err := global.DB.Where("user_id = ? AND (status = ? OR status = ?)", input.UserID, "approved", "rejected").First(&loanRequest).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": "record not found"})
 			return
@@ -161,6 +161,11 @@ func QueryLoanRequest(ctx *gin.Context) {
 	// Delete loan request
 	if err := global.DB.Unscoped().Delete(&loanRequest).Error; err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	if loanRequest.Status == "rejected" {
+		ctx.JSON(http.StatusOK, gin.H{"is_succeed": false})
 		return
 	}
 

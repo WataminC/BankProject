@@ -5,18 +5,22 @@
       <div v-if="loanExists" class="loan-info">
         <h2>Current Loan</h2>
         <table>
-          <tr>
-            <th>Amount</th>
-            <th>Interest</th>
-            <th>Total Amount</th>
-            <th>Status</th>
-          </tr>
-          <tr>
-            <td>{{ loan.amount }}</td>
-            <td>{{ loan.interest }}</td>
-            <td>{{ loan.total_amount }}</td>
-            <td>{{ loan.status }}</td>
-          </tr>
+          <thead>
+            <tr>
+              <th>Amount</th>
+              <th>Interest</th>
+              <th>Total Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ loan.amount }}</td>
+              <td>{{ loan.interest }}</td>
+              <td>{{ loan.total_amount }}</td>
+              <td>{{ loan.status }}</td>
+            </tr>
+          </tbody>
         </table>
       </div>
       <div class="loan-form">
@@ -62,10 +66,12 @@ export default {
     const checkLoanStatus = async () => {
       try {
         const response = await axios.post('http://localhost:8080/api/loan/request/query', {
-          user_id: 1, // Replace with actual user ID
+          user_id: Number(localStorage.getItem('userID')),
         });
         if (response.data.is_succeed) {
-          alert('Loan request succeeded!');
+          alert('Loan request approved!');
+        } else {
+          alert('Loan request rejected!');
         }
       } catch (error) {
         console.error(error);
@@ -75,7 +81,7 @@ export default {
     const requestLoan = async () => {
       try {
         await axios.post('http://localhost:8080/api/loan/request', {
-          user_id: 1, // Replace with actual user ID
+          user_id: Number(localStorage.getItem('userID')), 
           amount: loanAmount.value,
           interest: loanInterest.value,
         });
@@ -89,7 +95,7 @@ export default {
     const getLoan = async () => {
       try {
         const response = await axios.post('http://localhost:8080/api/loan', {
-          user_id: 1, // Replace with actual user ID
+          user_id: Number(localStorage.getItem('userID')), 
         });
         loan.value = response.data;
         loanExists.value = true;

@@ -31,8 +31,9 @@ func GetInfo(ctx *gin.Context) {
 
 	bg := context.Background()
 
+	var val map[string]interface{}
 	// Check if the cache exists
-	if val, err := global.RDB.HGetAll(bg, fmt.Sprintf("user:%v:profile", username)).Result(); err == nil {
+	if err := global.RDB.HGetAll(bg, fmt.Sprintf("user:%v:profile", username)).Scan(&val); err == nil {
 		ctx.JSON(http.StatusOK, gin.H{
 			"userID":         val["userID"],
 			"username":       username,
@@ -40,6 +41,7 @@ func GetInfo(ctx *gin.Context) {
 			"account_number": val["account_number"],
 			"balance":        val["balance"],
 		})
+		fmt.Printf("%v\n", val)
 		return
 	}
 

@@ -280,15 +280,13 @@ Development:
 响应体：
 ```json
 {
-    "loan_request": [
-        {
-            "id": 1,
-            "user_id": 1,
-            "amount": 1,
-            "interest": 2,
-            "status": "pending"
-        }
-    ]
+  {
+    "id": 1,
+    "user_id": 1,
+    "amount": 1,
+    "interest": 2,
+    "status": "pending",
+  },
 }
 ```
 

@@ -5,6 +5,7 @@ import UserDashboard from '@/views/DashboardView.vue';
 import TransactionView from '@/views/TransactionView.vue';
 import TransferView from '@/views/TransferView.vue';
 import LoanView from '@/views/LoanView.vue';
+import AdminView from '@/views/AdminView.vue';
 
 const routes = [
   // redirect to login view
@@ -42,6 +43,12 @@ const routes = [
     path: '/loan',
     name: 'Loan',
     component: LoanView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: AdminView,
     meta: { requiresAuth: true },
   },
   // 其他路由配置
