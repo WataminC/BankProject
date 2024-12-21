@@ -69,9 +69,10 @@ func GetLoanRequest(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"loan_request": response})
 }
 
-func ApproveLoanRequest(c *gin.Context) {
+func ProcessLoanRequest(c *gin.Context) {
 	var input struct {
-		ID uint `json:"id"`
+		ID       uint `json:"id"`
+		Approved bool `json:"is_approved"`
 	}
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -87,6 +88,24 @@ func ApproveLoanRequest(c *gin.Context) {
 
 	tx := global.DB.Begin()
 
+	var status = "approved"
+	if !input.Approved {
+		status = "rejected"
+	}
+
+	loanRequest.Status = status
+	if err := tx.Save(&loanRequest).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		tx.Rollback()
+		return
+	}
+
+	if !input.Approved {
+		tx.Commit()
+		c.JSON(http.StatusOK, gin.H{"message": "Loan request rejected"})
+		return
+	}
+
 	loan := models.Loan{
 		UserID:      loanRequest.UserID,
 		Amount:      loanRequest.Amount,
@@ -96,13 +115,6 @@ func ApproveLoanRequest(c *gin.Context) {
 	}
 
 	if err := tx.Create(&loan).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		tx.Rollback()
-		return
-	}
-
-	loanRequest.Status = "approved"
-	if err := tx.Save(&loanRequest).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		tx.Rollback()
 		return

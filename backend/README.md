@@ -294,15 +294,16 @@ Development:
 
 - 功能描述：查询当前为pending的贷款请求
 
-12. 同意贷款接口
+12. 处理贷款请求接口
 
 - 路径: /api/admin/loan
-- 方法: GET
+- 方法: POST
 
 请求体
 ```json
 {
-  "id" : 1
+  "id" : 1,
+  "is_approved" : true
 }
 ```
 
