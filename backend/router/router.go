@@ -35,12 +35,15 @@ func SetRouter() *gin.Engine {
 		api.POST("/transaction/transfer", controllers.AddTransaction)
 		api.GET("/transaction", controllers.GetTransaction)
 		api.POST("/loan/request", controllers.LoanRequest)
+		api.POST("/loan/request/query", controllers.QueryLoanRequest)
+		api.POST("loan", controllers.QueryLoan)
 	}
 
 	admin := r.Group("/api/admin")
 	admin.Use(middlewares.AdminMiddleWare())
 	{
-		admin.GET("/loan", controllers.GetLoanRequest)	
+		admin.POST("/loan", controllers.ApproveLoanRequest)
+		admin.GET("/loan", controllers.GetLoanRequest)
 	}
 
 	return r
