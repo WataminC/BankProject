@@ -335,6 +335,26 @@ Development:
 
 14. 还贷款接口
 
+- 路径：/api/loan/repay
+- 方法：POST
+
+请求体
+```json
+{
+  "user_id": 1,
+  "amount": 1
+}
+```
+响应体
+```json
+{
+  "is_succeed" : true,
+  "message": "repay successfully"
+}
+```
+
+- 功能描述：根据user_id在account表中查找对应的余额，如果余额不够还款，则返回对应消息，如果够的话则对应修改account中余额的值和loan表中total_amount的值，如果还款金额大于剩余所需还款金额则只还所需还款金额并删除loan表中对应的记录
+
 15. 查询贷款接口
 
 - 路径: /api/loan

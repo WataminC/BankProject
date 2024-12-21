@@ -105,8 +105,24 @@ export default {
       }
     };
 
-    const repayLoan = () => {
-      alert('Repay loan functionality not implemented yet');
+    const repayLoan = async () => {
+      try {
+        const response = await axios.post('http://localhost:8080/api/loan/repay', {
+          user_id: Number(localStorage.getItem('userID')),
+          amount: repayAmount.value,
+        });
+        alert(response.data.message);
+
+        // Refresh loan info
+        try {
+          await getLoan();
+        } catch (error) {
+          loanExists.value = false;
+        }
+      } catch (error) {
+        console.error(error);
+        alert('Repay loan failed');
+      }
     };
 
     const goBack = () => {

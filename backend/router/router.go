@@ -37,6 +37,7 @@ func SetRouter() *gin.Engine {
 		api.POST("/loan/request", controllers.LoanRequest)
 		api.POST("/loan/request/query", controllers.QueryLoanRequest)
 		api.POST("loan", controllers.QueryLoan)
+		api.POST("loan/repay", controllers.RepayLoan)
 	}
 
 	admin := r.Group("/api/admin")

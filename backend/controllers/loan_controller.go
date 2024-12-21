@@ -208,3 +208,69 @@ func QueryLoan(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, output)
 }
+
+func RepayLoan(ctx *gin.Context) {
+	var input struct {
+		UserID uint    `json:"user_id"`
+		Amount float64 `json:"amount"`
+	}
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var userAccount models.Account
+	if err := global.DB.Where("user_id = ?", input.UserID).First(&userAccount).Error; err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"is_succeed": false, "message": "account not found"})
+		return
+	}
+
+	var userLoan models.Loan
+	if err := global.DB.Where("user_id = ?", input.UserID).First(&userLoan).Error; err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"is_succeed": false, "message": "loan not found"})
+		return
+	}
+
+	if userAccount.Balance < input.Amount {
+		ctx.JSON(http.StatusOK, gin.H{"is_succeed": false, "message": "insufficient balance"})
+		return
+	}
+
+	tx := global.DB.Begin()
+
+	if input.Amount >= userLoan.TotalAmount {
+		repayAll := userLoan.TotalAmount
+		userAccount.Balance -= repayAll
+		if err := tx.Save(&userAccount).Error; err != nil {
+			tx.Rollback()
+			ctx.JSON(http.StatusInternalServerError, gin.H{"is_succeed": false, "message": err.Error()})
+			return
+		}
+		if err := tx.Unscoped().Delete(&userLoan).Error; err != nil {
+			tx.Rollback()
+			ctx.JSON(http.StatusInternalServerError, gin.H{"is_succeed": false, "message": err.Error()})
+			return
+		}
+		tx.Commit()
+		ctx.JSON(http.StatusOK, gin.H{"is_succeed": true, "message": "repay successfully"})
+		return
+	}
+
+	userAccount.Balance -= input.Amount
+	userLoan.TotalAmount -= input.Amount
+
+	if err := tx.Save(&userAccount).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, gin.H{"is_succeed": false, "message": err.Error()})
+		return
+	}
+
+	if err := tx.Save(&userLoan).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, gin.H{"is_succeed": false, "message": err.Error()})
+		return
+	}
+
+	tx.Commit()
+	ctx.JSON(http.StatusOK, gin.H{"is_succeed": true, "message": "repay successfully"})
+}
