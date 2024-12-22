@@ -77,7 +77,7 @@ Development:
 - 返回用户的JWT令牌，用于后续验证。
 
 3. 查看用户信息接口
-- 路径: /api/user
+- 路径: /api/account
 - 方法: GET
 
 - 请求头:
@@ -98,7 +98,7 @@ Development:
 - 功能描述: 根据用户的 JWT token 返回用户的基本信息。
 
 4. 存款接口
-- 路径: /api/deposit
+- 路径: /api/transaction/deposit
 - 方法: POST
 
 请求体:
@@ -117,7 +117,7 @@ Development:
 - 功能描述: 用户向指定的账户存款。
 
 5. 取款接口
-- 路径: /api/withdraw
+- 路径: /api/transaction/withdraw
 - 方法: POST
 
 请求体:
